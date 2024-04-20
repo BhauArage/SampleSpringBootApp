@@ -23,6 +23,7 @@ public class UserController {
     public  String getUsers(@RequestParam(value = "page", defaultValue = "1") int page,
                             @RequestParam(value = "limit", defaultValue = "50") int limit,
                             @RequestParam(value="sort", defaultValue = "desc", required = false) String sort) {
+//        if(true) throw new UserServiceException("ddfnfbvn");
         return "get user page : "+page+" limit : "+limit+" sort : "+sort;
     }
 
