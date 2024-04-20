@@ -6,7 +6,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -45,8 +44,9 @@ public class UserController {
             })
     public  ResponseEntity<UserRest> createUser(@Valid @RequestBody UserDetailsRequestModel userDetails) {
         UserRest res=new UserRest();
-        res.setFirstName("Bhavika");
-        res.setLastName("Arage");
+        res.setFirstName(userDetails.getFirstName());
+        res.setLastName(userDetails.getLastName());
+        res.setEmail(userDetails.getEmail());
         return new ResponseEntity<UserRest>(res, HttpStatus.OK);
     }
 
