@@ -3,21 +3,24 @@ package com.example.sample.app.ui.controller;
 import com.example.sample.app.ui.model.request.UpdatedUserDetailsRequestModel;
 import com.example.sample.app.ui.model.request.UserDetailsRequestModel;
 import com.example.sample.app.ui.model.response.UserRest;
+import com.example.sample.app.userservice.UserService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("users")
 public class UserController {
 
     Map<String, UserRest> users;
+
+    @Autowired
+    UserService userService;
 
     @GetMapping
     public  String getUsers(@RequestParam(value = "page", defaultValue = "1") int page,
@@ -50,16 +53,7 @@ public class UserController {
                     MediaType.APPLICATION_JSON_VALUE
             })
     public  ResponseEntity<UserRest> createUser(@Valid @RequestBody UserDetailsRequestModel userDetails) {
-        UserRest res=new UserRest();
-        res.setFirstName(userDetails.getFirstName());
-        res.setLastName(userDetails.getLastName());
-        res.setEmail(userDetails.getEmail());
-
-        String userID= UUID.randomUUID().toString();
-        res.setUserID(userID);
-        if(users==null) users=new HashMap<>();
-        users.put(userID,res);
-
+        UserRest res=userService.createUser(userDetails);
         return new ResponseEntity<UserRest>(res, HttpStatus.OK);
     }
 
