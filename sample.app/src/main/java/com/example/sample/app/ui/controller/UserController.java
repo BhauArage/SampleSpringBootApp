@@ -1,5 +1,6 @@
 package com.example.sample.app.ui.controller;
 
+import com.example.sample.app.ui.model.request.UpdatedUserDetailsRequestModel;
 import com.example.sample.app.ui.model.request.UserDetailsRequestModel;
 import com.example.sample.app.ui.model.response.UserRest;
 import jakarta.validation.Valid;
@@ -8,9 +9,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("users")
 public class UserController {
+
+    Map<String, UserRest> users;
 
     @GetMapping
     public  String getUsers(@RequestParam(value = "page", defaultValue = "1") int page,
@@ -26,12 +33,11 @@ public class UserController {
             MediaType.APPLICATION_JSON_VALUE
     })
     public ResponseEntity<UserRest> getUser(@PathVariable String userId) {
-        UserRest res=new UserRest();
-        res.setUserID(userId);
-        res.setFirstName("Bhavika");
-        res.setLastName("Arage");
-//        return res;
-        return new ResponseEntity<UserRest>(res, HttpStatus.OK);
+        if(users.containsKey(userId)){
+            return new ResponseEntity<>(users.get(userId), HttpStatus.OK);
+        }
+        else
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping(consumes =  {
@@ -47,12 +53,29 @@ public class UserController {
         res.setFirstName(userDetails.getFirstName());
         res.setLastName(userDetails.getLastName());
         res.setEmail(userDetails.getEmail());
+
+        String userID= UUID.randomUUID().toString();
+        res.setUserID(userID);
+        if(users==null) users=new HashMap<>();
+        users.put(userID,res);
+
         return new ResponseEntity<UserRest>(res, HttpStatus.OK);
     }
 
-    @PutMapping
-    public  String updateUser() {
-        return "update user";
+    @PutMapping(path = "/{userID}", consumes =  {
+            MediaType.APPLICATION_XML_VALUE,
+            MediaType.APPLICATION_JSON_VALUE
+    },
+            produces =  {
+                    MediaType.APPLICATION_XML_VALUE,
+                    MediaType.APPLICATION_JSON_VALUE
+            })
+    public  UserRest updateUser(@PathVariable String userID,@Valid @RequestBody UpdatedUserDetailsRequestModel userDetails) {
+        UserRest stored=users.get(userID);
+        stored.setFirstName(userDetails.getFirstName());
+        stored.setLastName(userDetails.getLastName());
+        users.put(userID,stored);
+        return  stored;
     }
 
     @DeleteMapping
